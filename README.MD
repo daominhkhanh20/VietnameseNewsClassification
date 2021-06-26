@@ -49,12 +49,20 @@ python3 train.py --model "BERT"//"LSTM" [REQUIRED]
 
 - MachineLearning 
 <pre>
-python3 ML.py --model "NB"//"KNN" [REQUIRED]          
+python3 ML.py --model "NB"//"KNN" [REQUIRED]  
+              --n_centers 20 [OPTIONAL]
+              --n_components 300 [OPTIONAL]
+              --plot_result False [OPTIONAL]        
 </pre>
 
 ## Testing
+- Running in terminal with file text
 <pre>
 python3 infer.py --model "NB"//"KNN"//"LSTM"//"BERT" [REQUIRED]
                  --file_test "a.txt"   
+</pre>
+- Running with web UI
+<pre>
+python3 runner.py 
 </pre>
 
