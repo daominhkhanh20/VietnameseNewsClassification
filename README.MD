@@ -17,7 +17,9 @@ A Large-scale Vietnamese News Text Classification Corpus ([link](https://github.
 |Vi tinh         |   2481     |  4560     |
 
 ## Insall package requirement
+<pre>
 pip install -r requirements.txt 
+</pre>
 
 ## Preprocessing News
 - Convert all word in to unicode composed 
