@@ -1,7 +1,6 @@
 import pandas as pd 
 import numpy as np 
 import seaborn as sns
-from seaborn.utils import _assign_default_kwargs 
 from sklearn.feature_extraction.text import CountVectorizer,TfidfTransformer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.naive_bayes import MultinomialNB
@@ -23,6 +22,7 @@ parser.add_argument('--n_centers',type=int,default=10,help="Number center for KN
 parser.add_argument('--path_to_save_result',type=str,default="Result")
 parser.add_argument('--path_to_save_model',type=str,default='Model/')
 parser.add_argument('--plot_result',type=bool,default=False,help="whether plot result")
+parser.add_argument('--n_components',type=int,default=300)
 parser.add_argument('--file_name',type=str,default="Model",help="File name image to saved")
 parser.add_argument('--save_model',type=bool,default=False)
 arg=parser.parse_args()
@@ -92,7 +92,7 @@ class KNN:
         self.n_center=n_centers
         self.model=Pipeline([
                     ('vect',CountVectorizer(ngram_range=(1,1),max_features=None)),
-                    ('svd',TruncatedSVD(n_components=300,random_state=42)),
+                    ('svd',TruncatedSVD(n_components=arg.n_components,random_state=42)),
                     ('clf',KNeighborsClassifier(n_neighbors=n_centers))
         ])
         
