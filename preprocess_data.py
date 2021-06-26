@@ -24,5 +24,6 @@ def preprocessing(folder_data_raw,folder_data,file_data):
 
     file_s.close()
 
-preprocessing('Train_Full','News','train_n')
-preprocessing('Test_Full','News','test_n')
+if __name__=='__main__':
+    preprocessing('Train_Full','News','train_n')
+    preprocessing('Test_Full','News','test_n')
