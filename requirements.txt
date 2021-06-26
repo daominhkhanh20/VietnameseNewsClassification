@@ -1,0 +1,11 @@
+pytorch
+transformers
+numpy
+flask
+regex
+pandas
+matplotlib
+underthesea
+pyvi
+vncorenlp
+seaborn

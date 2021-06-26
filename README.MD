@@ -16,6 +16,9 @@ A Large-scale Vietnamese News Text Classification Corpus ([link](https://github.
 |Van hoa         |   3080     |  6250     |
 |Vi tinh         |   2481     |  4560     |
 
+## Insall package requirement
+pip install -r requirements.txt 
+
 ## Preprocessing News
 - Convert all word in to unicode composed 
 - Covert all word into the old version diacritics ([Reference](https://vi.wikipedia.org/wiki/Quy_t%E1%BA%AFc_%C4%91%E1%BA%B7t_d%E1%BA%A5u_thanh_trong_ch%E1%BB%AF_qu%E1%BB%91c_ng%E1%BB%AF))
