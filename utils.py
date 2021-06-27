@@ -3,7 +3,6 @@ import pandas as pd
 from model import News,MyCollate
 import pickle
 import torch 
-from transformers import AutoTokenizer
 from sklearn.metrics import accuracy_score
 from matplotlib import pyplot as plt 
 
@@ -83,13 +82,13 @@ def encode_data(data,tokenizer):
     return result
 
 
-def get_loader_bert(batch_size):
+def get_loader_bert(tokenizer,batch_size):
     train=pd.read_csv('News/train.csv')
     val=pd.read_csv('News/val.csv')
     test=pd.read_csv('News/test_n.csv')
-    train['data']=encode_data(train)
-    test['data']=encode_data(test)
-    val['data']=encode_data(val)
+    train['data']=encode_data(train,tokenizer)
+    test['data']=encode_data(test,tokenizer)
+    val['data']=encode_data(val,tokenizer)
     train_dataset_tensor=torch.utils.data.TensorDataset(torch.tensor(train['data'],dtype=torch.long),torch.tensor(train['label'],dtype=torch.long))
     test_dataset_tensor=torch.utils.data.TensorDataset(torch.tensor(test['data'],dtype=torch.long),torch.tensor(test['label'],dtype=torch.long))
     val_dataset_tensor=torch.utils.data.TensorDataset(torch.tensor(val['data'],dtype=torch.long),torch.tensor(val['label'],dtype=torch.long))

@@ -1,8 +1,5 @@
-from urllib import parse
 from pandas.core.frame import DataFrame
 import torch 
-from torch import nn 
-import numpy as np 
 from torch import optim 
 import time 
 import argparse
@@ -10,6 +7,7 @@ from model import *
 from utils import * 
 from transformers import AdamW,get_constant_schedule,get_linear_schedule_with_warmup
 from collections import defaultdict
+from transformers import AutoTokenizer
 
 device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 parser=argparse.ArgumentParser()
@@ -28,7 +26,8 @@ arg=parser.parse_args()
 criterion=LabelSmoothingCrossEntropyLoss()
 
 if arg.model=="BERT":
-    train_loader,test_loader,val_loader=get_loader_bert(arg.batch_size)
+    tokenizer=AutoTokenizer.from_pretrained('vinai/phobert-base')
+    train_loader,test_loader,val_loader=get_loader_bert(tokenizer,arg.batch_size)
     model=Model_BERT(arg.n_classes).to(device)
     optimizer=AdamW(model.parameters(),lr=arg.lr)
     model.fine_tune_bert(False)
@@ -43,6 +42,7 @@ elif arg.model=="LSTM":
 
 def train_LSTM():
     history=defaultdict(list)
+    print("start")
     for epoch in range(arg.n_epochs):
         start_time=time.time()
         train_acc,train_loss=train_model(model,train_loader,optimizer,criterion)        
@@ -68,6 +68,7 @@ def train_BERT():
     scheduler_frozen=get_constant_schedule(optimizer)
     #x_batch,y_batch=next(iter(train_loader))
     history=defaultdict(list)
+    print("start")
     for epoch in range(arg.n_epochs):
 
         if epoch > 0 and frozen:
