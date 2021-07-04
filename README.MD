@@ -22,8 +22,8 @@ pip install -r requirements.txt
 </pre>
 
 ## Preprocessing News
-- Convert all word in to unicode composed 
-- Covert all word into the old version diacritics ([Reference](https://vi.wikipedia.org/wiki/Quy_t%E1%BA%AFc_%C4%91%E1%BA%B7t_d%E1%BA%A5u_thanh_trong_ch%E1%BB%AF_qu%E1%BB%91c_ng%E1%BB%AF))
+- Convert all word into unicode composed 
+- Convert all words into the rules for placing the old version bar marks vietnamese ([Reference](https://vi.wikipedia.org/wiki/Quy_t%E1%BA%AFc_%C4%91%E1%BA%B7t_d%E1%BA%A5u_thanh_trong_ch%E1%BB%AF_qu%E1%BB%91c_ng%E1%BB%AF))
 - Tokenizer VietNamese word(Đại học Bách Khoa Hà Nội ==> Đại_học Bách_Khoa Hà_Nội)
 - Remove all punctuation ,number and stop word 
 - Remove all word which has length <3
@@ -32,8 +32,9 @@ pip install -r requirements.txt
 ## Model
 - Naive Bayes
 - KNN
-- BiLSTM(2 layers)
-- BERT+BiLSTM(2 layers)
+- BiLSTM
+- BERT 
+- BERT+BiLSTM
 
 ## Training
 - DeepLearning

@@ -7,6 +7,7 @@ from torch.nn.utils.rnn import pad_sequence
 from transformers import AutoModel,AutoTokenizer
 from torch.nn import functional as F 
 device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 class Vocabulary:
     def __init__(self):
         self.vocab_size=100000
@@ -59,9 +60,9 @@ class MyCollate:
         texts=pad_sequence(texts,batch_first=True,padding_value=self.pad_idx)
         return texts,labels
     
-class Model_RNN(nn.Module):
+class BILSTM(nn.Module):
     def __init__(self,embedding_size,hidden_size,vocab_size,num_class,drop_prob=0.2):
-        super(Model_RNN,self).__init__()
+        super(BILSTM,self).__init__()
         self.embedding_size=embedding_size
         self.hidden_size=hidden_size
         self.num_class=num_class
@@ -72,6 +73,7 @@ class Model_RNN(nn.Module):
                         num_layers=2,
                         bidirectional=True)
         self.dropout=nn.Dropout(drop_prob)
+        self.norm=nn.LayerNorm(hidden_size*4)
         self.linear=nn.Linear(hidden_size*4,num_class)
     
     def forward(self,texts):
@@ -82,8 +84,9 @@ class Model_RNN(nn.Module):
         avg_hidden=torch.mean(lstm_out,dim=1)
         max_hidden,_=torch.max(lstm_out,dim=1)
         input_linear=torch.cat((avg_hidden,max_hidden),dim=1)
-        out=self.linear(input_linear)
+        out=self.linear(self.norm(input_linear))
         return out
+
 
 class LabelSmoothingCrossEntropyLossv1(nn.Module):
     def __init__(self,n_classes,smoothing_label=0.1):
@@ -100,7 +103,7 @@ class LabelSmoothingCrossEntropyLossv1(nn.Module):
         return temp.mean()
 
 class LabelSmoothingCrossEntropyLoss(nn.Module):
-    def __init__(self,smoothing_value,reduction='mean'):
+    def __init__(self,smoothing_value=0.1,reduction='mean'):
         super(LabelSmoothingCrossEntropyLoss,self).__init__()
         self.smoothing_value=smoothing_value
         self.reduction=reduction
@@ -116,32 +119,44 @@ class LabelSmoothingCrossEntropyLoss(nn.Module):
         return (1-self.smoothing_value)*nll+ self.smoothing_value*(loss/n_classes)
 
 
+class BERT(nn.Module):
+    def __init__(self,n_classes):
+        super(BERT,self).__init__()
+        self.n_classes=n_classes
+        self.bert=AutoModel.from_pretrained("vinai/phobert-base")
+        self.norm=nn.LayerNorm(self.bert.config.hidden_size)
+        self.linear=nn.Linear(self.bert.config.hidden_size,n_classes)
 
-class Model_BERT(nn.Module):
+    def fine_tune_bert(self,fine_tune=False):
+            for child in self.bert.children():
+                for param in child.parameters():
+                    param.requires_grad=fine_tune
+
+    def forward(self,x_batch):
+        cls_embedding = self.bert(x_batch)[1]
+        out=self.norm(cls_embedding)
+        out=self.linear(out)
+        return out
+
+class BERT_LSTM(nn.Module):
     def __init__(self,n_classes,drop_prob=0.2):
-        super(Model_BERT,self).__init__()
+        super(BERT_LSTM,self).__init__()
         self.n_classes=n_classes
         self.bert=AutoModel.from_pretrained("vinai/phobert-base")
         self.tokenizer=AutoTokenizer.from_pretrained("vinai/phobert-base")
         self.lstm=nn.LSTM(input_size=self.bert.config.hidden_size,
-                        hidden_size=512,
-                        batch_first=True,
-                        num_layers=2,
-                        bidirectional=True)
+                      hidden_size=512,
+                      batch_first=True,
+                      num_layers=2,
+                      bidirectional=True)
         self.linear=nn.Sequential(
             nn.Linear(512*4,512),
+            nn.LayerNorm(512),
             nn.ReLU(),
-            nn.Dropout(drop_prob),
             nn.Linear(512,self.n_classes)
         )
-        self.max_sequences_length=256
-        self.fine_tune_bert(False)
-    
-    def fine_tune_bert(self,fine_tune=False):
-        for child in self.bert.children():
-            for param in child.parameters():
-                param.requires_grad=fine_tune
-        
+        #self.fine_tune_bert(False)
+      
     def forward(self,x_batch):
         word_embedding = self.bert(x_batch)[0]
         lstm_out,_=self.lstm(word_embedding)
@@ -150,4 +165,10 @@ class Model_BERT(nn.Module):
         input_linear=torch.cat((avg_hidden,max_hidden),dim=1)
         out=self.linear(input_linear)
         return out
+    
+    def fine_tune_bert(self,fine_tune=False):
+        for child in self.bert.children():
+            for param in child.parameters():
+                param.requires_grad=fine_tune
+        
     

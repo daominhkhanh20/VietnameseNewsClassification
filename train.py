@@ -25,10 +25,13 @@ arg=parser.parse_args()
 #criterion=nn.CrossEntropyLoss()
 criterion=LabelSmoothingCrossEntropyLoss()
 
-if arg.model=="BERT":
+if arg.model=="BERT_Base" or arg.model=="BERT_LSTM":
     tokenizer=AutoTokenizer.from_pretrained('vinai/phobert-base')
     train_loader,test_loader,val_loader=get_loader_bert(tokenizer,arg.batch_size)
-    model=Model_BERT(arg.n_classes).to(device)
+    if arg.model=="BERT_Base":
+        model=BERT(arg.n_classes).to(device)
+    elif arg.model=="BERT_LSTM":
+        model=BERT_LSTM(arg.n_classes).to(device)
     optimizer=AdamW(model.parameters(),lr=arg.lr)
     model.fine_tune_bert(False)
 
@@ -91,12 +94,12 @@ def train_BERT():
         history['val_loss'].append(val_loss)
         if epoch!=0 and epoch%arg.n_epoch_to_saved==0:
             print("--------------Time for testing-----------------")
-            testing(test_loader) 
+            testing(model,test_loader) 
             save_checkpoint(model,optimizer,epoch,history,scheduler)
 
 
 if __name__=="__main__":
-    if arg.model=="BERT":
+    if arg.model=="BERT_Base" or arg.model=="BERT_LSTM":
         train_BERT()
         
     elif arg.model=="LSTM":

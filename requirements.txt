@@ -9,3 +9,6 @@ underthesea
 pyvi
 vncorenlp
 seaborn
+tensorflow
+pickle
+argparse
