@@ -33,7 +33,6 @@ pip install -r requirements.txt
 - Naive Bayes
 - KNN
 - BiLSTM
-- BERT 
 - BERT+BiLSTM
 
 ## Training
@@ -67,3 +66,12 @@ python3 infer.py --model "NB"//"KNN"//"LSTM"//"BERT" [REQUIRED]
 python3 runner.py 
 </pre>
 
+## Result
+
+| Model\Metric  | Accuracy | Precision score | Recall Score| 
+|---------------|:---------|:----------------|:------------|
+| KNN           |0.7983    | 0.8156          | 0.7983      |
+| Naive bayes   | 0.90     | 0.9034          | 0.90        |
+| BILSTM        | 0.9041   | 0.9034          | 0.9041      |
+|BERT + BILSTM  | 0.9122   | 0.9119          | 0.9122      |
+| Ensemble 3 model | 0.9210  | 0.9211        | 0.9210      |
