@@ -40,7 +40,7 @@ elif arg.model=="LSTM":
     embedding_size=arg.embedding_dim
     hidden_size=arg.hidden_dim
     vocab_size=train_dataset.vocab.vocab_size
-    model=Model_RNN(embedding_size,hidden_size,vocab_size,arg.n_classes).to(device)
+    model=BILSTM(embedding_size,hidden_size,vocab_size,arg.n_classes).to(device)
     optimizer=optim.Adam(model.parameters(),lr=arg.lr)
 
 def train_LSTM():

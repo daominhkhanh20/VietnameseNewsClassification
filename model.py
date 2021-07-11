@@ -155,7 +155,7 @@ class BERT_LSTM(nn.Module):
             nn.ReLU(),
             nn.Linear(512,self.n_classes)
         )
-        #self.fine_tune_bert(False)
+        self.fine_tune_bert(False)
       
     def forward(self,x_batch):
         word_embedding = self.bert(x_batch)[0]

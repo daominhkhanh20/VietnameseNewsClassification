@@ -3,7 +3,7 @@ import argparse
 import numpy as np 
 import pickle 
 from processing import process_data
-from model import Model_BERT,Model_RNN
+from model import Model_BERT,Model_RNN, Vocabulary
 from utils import encode_text
 import sys
 import warnings
@@ -32,13 +32,12 @@ elif arg.model=="KNN":
         model=pickle.load(file)
 
 elif arg.model=="LSTM":
-    
-    model_state=torch.load('Model/model_lstm.pth')
-    model=Model_RNN(embedding_size=300,hidden_size=256,vocab_size=100000,num_class=10).to(device)
-    model.load_state_dict(model_state['model'])
-    model.eval()
     with open("Model/vocab.pickle","rb") as file:
         vocab=pickle.load(file)
+    model_state=torch.load('Model/model_lstm.pth')
+    model=Model_RNN(embedding_size=300,hidden_size=256,vocab_size=vocab.vocab_size,num_class=10).to(device)
+    model.load_state_dict(model_state['model'])
+    model.eval()
 
 elif arg.model=="BERT":
     model_state=torch.load('Model/model_bert.pth')
@@ -56,7 +55,7 @@ def get_label():
     elif arg.model=="LSTM":
         temp=vocab.convert_text_to_int(text)
         data=torch.tensor(temp).to(device)
-        out=model(temp)
+        out=model(temp.unsqueeze(dim=0))
         index=torch.argmax(out,dim=1).item()
         label=labels[index]
 
