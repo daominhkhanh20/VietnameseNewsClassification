@@ -3,7 +3,8 @@ import argparse
 import numpy as np 
 import pickle 
 from processing import process_data
-from model import Model_BERT,Model_RNN, Vocabulary
+from transformers import AutoTokenizer
+from model import BERT_LSTM,BILSTM, Vocabulary,LabelSmoothingCrossEntropyLoss
 from utils import encode_text
 import sys
 import warnings
@@ -32,16 +33,16 @@ elif arg.model=="KNN":
         model=pickle.load(file)
 
 elif arg.model=="LSTM":
-    with open("Model/vocab.pickle","rb") as file:
+    with open("Model/LSTM/vocab.pickle","rb") as file:
         vocab=pickle.load(file)
-    model_state=torch.load('Model/model_lstm.pth')
-    model=Model_RNN(embedding_size=300,hidden_size=256,vocab_size=vocab.vocab_size,num_class=10).to(device)
+    model_state=torch.load('Model/LSTM/model39.pth',map_location='cpu')
+    model=BILSTM(embedding_size=300,hidden_size=256,vocab_size=vocab.vocab_size,num_class=10).to(device)
     model.load_state_dict(model_state['model'])
     model.eval()
 
 elif arg.model=="BERT":
-    model_state=torch.load('Model/model_bert.pth')
-    model=Model_BERT(n_classes=10).to(device)
+    model_state=torch.load('Model/Bert/model21.pth',map_location='cpu')
+    model=BERT_LSTM(n_classes=10).to(device)
     model.load_state_dict(model_state['model'])
     model.eval()
 
@@ -55,13 +56,13 @@ def get_label():
     elif arg.model=="LSTM":
         temp=vocab.convert_text_to_int(text)
         data=torch.tensor(temp).to(device)
-        out=model(temp.unsqueeze(dim=0))
+        out=model(data.unsqueeze(dim=0))
         index=torch.argmax(out,dim=1).item()
         label=labels[index]
 
     elif arg.model=="BERT":
-        
-        temp=encode_text(text)
+        tokenizer=AutoTokenizer.from_pretrained('vinai/phobert-base')
+        temp=encode_text(text,tokenizer)
         data=torch.tensor(temp,dtype=torch.long).view(1,256).to(device)
         out=model(data)
         index=torch.argmax(out,dim=1).item()
