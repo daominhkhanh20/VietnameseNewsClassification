@@ -1,4 +1,6 @@
-## VietNamese Classification News Project 
+# VietNamese Classification News Project 
+
+
 
 ## Dataset
 A Large-scale Vietnamese News Text Classification Corpus ([link](https://github.com/duyvuleo/VNTC))
